@@ -47,7 +47,7 @@ enum ShortcutValidator {
         case .modifierOnly:
             return shortcut.modifierFlags.isEmpty ? .plainKeyRequiresModifier : nil
         case .key:
-            if Shortcut.isFunctionKeyCode(shortcut.keyCode) {
+            if Shortcut.isFunctionKeyCode(shortcut.keyCode) || shortcut.keyCode == UInt16(kVK_ANSI_Backslash) {
                 return nil
             }
 
