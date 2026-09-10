@@ -60,7 +60,7 @@ enum ShortcutValidator {
                 return nil
             }
 
-            if Shortcut.isFunctionKeyCode(shortcut.keyCode) {
+            if Shortcut.isFunctionKeyCode(shortcut.keyCode) || shortcut.keyCode == UInt16(kVK_ANSI_Backslash) {
                 return nil
             }
 
