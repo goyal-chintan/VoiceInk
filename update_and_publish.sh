@@ -180,6 +180,20 @@ echo "Copying built app to $DEST_APP..."
 if ditto "$BUILT_APP" "$DEST_APP"; then
   echo "Stripping quarantine attributes..."
   xattr -cr "$DEST_APP"
+
+  # Ensure stable code signing identity with entitlements is applied
+  SIGNING_ID="$(security find-identity -v -p codesigning 2>/dev/null | awk -F '"' '$2 ~ /^Apple Development: / { print $2; exit }')"
+  if [ -z "$SIGNING_ID" ]; then
+    SIGNING_ID="$(security find-identity -v -p codesigning 2>/dev/null | awk -F '"' '$2 ~ /(Mac Developer|.*Development|.*Dev.*)/ { print $2; exit }')"
+  fi
+  if [ -n "$SIGNING_ID" ]; then
+    echo "Applying stable code signature to $DEST_APP: $SIGNING_ID..."
+    codesign --force --deep --sign "$SIGNING_ID" \
+      --entitlements "$REPO_ROOT/VoiceInk/VoiceInk.local.entitlements" \
+      --options runtime \
+      "$DEST_APP"
+  fi
+
   if [ -n "$TEMP_BACKUP" ] && [ -d "$TEMP_BACKUP" ]; then
     rm -rf "$TEMP_BACKUP"
   fi
