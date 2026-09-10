@@ -92,6 +92,13 @@ local: check setup
 		build
 	@APP_PATH="$(LOCAL_DERIVED_DATA)/Build/Products/Release/VoiceInk.app" && \
 	if [ -d "$$APP_PATH" ]; then \
+		if [ -n "$$SIGNING_IDENTITY" ] && [ "$$SIGNING_IDENTITY" != "-" ]; then \
+			echo "Signing VoiceInk.app with stable identity: $$SIGNING_IDENTITY..."; \
+			codesign --force --deep --sign "$$SIGNING_IDENTITY" \
+				--entitlements "$(CURDIR)/VoiceInk/VoiceInk.local.entitlements" \
+				--options runtime \
+				"$$APP_PATH"; \
+		fi; \
 		echo "Copying VoiceInk.app to ~/Downloads..."; \
 		rm -rf "$$HOME/Downloads/VoiceInk.app"; \
 		ditto "$$APP_PATH" "$$HOME/Downloads/VoiceInk.app"; \
